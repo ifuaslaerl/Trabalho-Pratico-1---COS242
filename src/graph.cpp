@@ -15,6 +15,28 @@ struct Grafo{
 
     Grafo(int n_) : n(n_+1), m(0), grau(n_+1), adj(n_+1) {}
 
+    vector<vector<int>> components(){ // tarefa 6
+        vector<vector<int>> asw;
+        vis.assign(n+1, 0);
+        for(int v=1; v<=n; v++){
+            if(vis[v]) continue;
+            vector<int> comp;
+            dfs(v, comp);
+            asw.push_back(comp);
+        }
+        sort(asw.rbegin(), asw.rend());
+        return asw;
+    }
+
+    int dfs(int v, vector<int> &c){ // tarefa 6
+        vis[v] = 1;
+        c.push_back(v);
+        for(int prox: adj[v]){
+            if(vis[prox]) continue;
+            dfs(prox, c);
+        }
+    }
+
     int dist(int u, int v){ // tarefa 5
         bfs(u);
         return dist[v];
