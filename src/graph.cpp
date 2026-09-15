@@ -10,11 +10,41 @@ struct Grafo{
 
     int n, m;
     int menor, maior, total;
-    vector<int> grau;
+    vector<int> grau, vis, dist, pai;
     vector<vector<int>> adj;
 
     Grafo(int n_) : n(n_+1), m(0), grau(n_+1), adj(n_+1) {}
 
+    int dist(int u, int v){ // tarefa 5
+        bfs(u);
+        return dist[v];
+    }
+
+    int diametro(){ // tarefa 5
+        if(is_a_tree()){
+            bfs(1);
+            int v1 = max_element(dist.begin()+1, dist.end()) - dist.begin();
+            bfs(v1);
+            int v2 = max_element(dist.begin()+1, dist.end()) - dist.begin();
+            bfs(v2);
+            return *max_element(dist.begin()+1, dist.end());
+        }
+
+        int asw=0;
+        for(int v=1; v<=n; v++){
+            bfs(v);
+            asw = max(asw, *max_element(dist.begin()+1, dist.end()));
+        }
+
+        return asw;
+    }
+
+    bool is_a_tree(){
+        if(m != n-1) return false;
+        bfs(1);
+        return *min_element(vis.begin()+1, vis.end());
+    }
+    
     void add_edge(int u, int v){ // tarefa 1
         adj[u].push_back(v);
         adj[v].push_back(u);
@@ -22,8 +52,11 @@ struct Grafo{
         m++;
     }
 
-    void bfs(int start){ // Tarefa 4
-        vector<int> vis(n+1, 0), dist(n+1, 0), pai(n+1, 0);
+    void bfs(int start, bool print=false){ // Tarefa 4
+        vis.assign(n+1, 0);
+        dist.assign(n+1, 0);
+        pai.assign(n+1, 0);
+
         queue<int> fila;
         
         fila.push(start);
@@ -42,12 +75,14 @@ struct Grafo{
             }
         }
 
+        if(!print) return;
+
         cout << "--------------------------------\n";
         cout << "Vetor de pais:\n";
         for(int v=1; v<=n; v++) cout << pai[v] << " "; cout << "\n";
 
         cout << "Vetor de profundidade:\n";
-        for(int v=1; v<=n; v++) cout << pai[v] << " "; cout << "\n";
+        for(int v=1; v<=n; v++) cout << dist[v] << " "; cout << "\n";
         cout << "--------------------------------\n";
     }
 
