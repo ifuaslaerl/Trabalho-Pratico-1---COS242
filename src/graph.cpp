@@ -13,7 +13,7 @@ struct Grafo{
     vector<int> grau, vis, dist, pai;
     vector<vector<int>> adj;
 
-    Grafo(int n_) : n(n_+1), m(0), grau(n_+1), adj(n_+1) {}
+    Grafo(int n_) : n(n_), m(0), grau(n_+1), adj(n_+1) {}
 
     vector<vector<int>> components(){ // tarefa 6
         vector<vector<int>> asw;
@@ -24,11 +24,13 @@ struct Grafo{
             dfs(v, comp);
             asw.push_back(comp);
         }
-        sort(asw.rbegin(), asw.rend());
+        sort(asw.begin(), asw.end(), [](const vector<int> &a, const vector<int> &b){
+            return a.size() > b.size();
+        });
         return asw;
     }
 
-    int dfs(int v, vector<int> &c){ // tarefa 6
+    void dfs(int v, vector<int> &c){ // tarefa 6
         vis[v] = 1;
         c.push_back(v);
         for(int prox: adj[v]){
@@ -37,7 +39,7 @@ struct Grafo{
         }
     }
 
-    int dist(int u, int v){ // tarefa 5
+    int distancia(int u, int v){ // tarefa 5
         bfs(u);
         return dist[v];
     }
@@ -94,6 +96,7 @@ struct Grafo{
                 vis[prox] = true;
                 dist[prox] = dist[v] + 1;
                 pai[prox] = v;
+                fila.push(prox);
             }
         }
 
@@ -113,20 +116,22 @@ struct Grafo{
         cout << "Numero de vertices = " << n << "\n";
         cout << "Numero de arestas  = " << m << "\n";
 
-        vector<int> ord = grau;
+        vector<int> ord(grau.begin()+1, grau.end());
         sort(ord.begin(), ord.end());
-        
+
         menor=n, maior=0, total=0;
         for(int v=1; v<=n; v++){
             menor = min(menor, grau[v]);
             maior = max(maior, grau[v]);
-            total += grau[v];        
+            total += grau[v];
         }
+
+        ld mediana = (n%2) ? ord[n/2] : (ord[n/2-1] + ord[n/2])/2.0;
 
         cout << "Grau minimo        = " << menor << "\n";
         cout << "Grau maximo        = " << maior << "\n";
         cout << "Grau médio         = " << fixed << setprecision(5) << (ld)total/n << "\n";
-        cout << "Grau mediano       = " << fixed << setprecision(2) << (ld)(n%2 ? ord[n/2] : (ord[n/2] + ord[n/2+1])/2) << "\n";
+        cout << "Grau mediano       = " << fixed << setprecision(2) << mediana << "\n";
         cout << "--------------------------------\n";
     }
 
@@ -141,7 +146,3 @@ struct Grafo{
     }
 
 };
-
-int main(){
-    return 0;
-}
